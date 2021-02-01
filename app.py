@@ -3,7 +3,7 @@ import os
 import zipfile
 from io import BytesIO
 from os import path
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, make_response
 from flask_restful import Resource, Api
 from db import AppDB
 
@@ -33,21 +33,21 @@ class Images(Resource):
     def post(self):
         url = request.get_data(as_text=True)
         order_id = db.post_img(url)
-        return order_id, 202
+        return make_response(str(order_id), 202)
 
 class Content(Resource):
     def post(self):
         url = request.get_data(as_text=True)
         order_id = db.post_text(url)
-        return order_id, 202
+        return make_response(str(order_id), 202)
 
 class Status(Resource):
     def get(self, order_id):
         status = db.order_status(order_id)
         if status:
-            return status, 200
+            return make_response(status, 200)
         else:
-            return 'Not Found', 404
+            return make_response('Not Found', 404)
 
 class Download(Resource):
     def get(self, order_id):
@@ -57,7 +57,7 @@ class Download(Resource):
         if not path.isdir(order_dir):
             return '', 404
         elif status != 'finished':
-            return 'Order not ready!', 204
+            return make_response('Order not ready!', 204)
 
         file_name = '{}.zip'.format(order_id)
         file_stream = BytesIO()

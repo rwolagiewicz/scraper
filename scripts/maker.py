@@ -28,40 +28,24 @@ def insert_tb(order_id, tb):
         VALUES (%(order_id)s, %(tb)s)
     ''', {'order_id': order_id, 'tb': tb, })
 
-def process_txt(order_id, url):
-    try:
-        update_status(order_id, 'processing')
-        order_dir = path.join(files_dir, str(order_id))
-        result_file = path.join(order_dir, '{}.txt'.format(order_id))
+def process_txt(order_dir, url):
+    result_file = path.join(order_dir, 'content.txt')
+    content = Scraper(url).get_content()
+    os.makedirs(order_dir)
 
-        content = Scraper(url).get_content()
-        os.makedirs(order_dir)
+    with open(result_file, 'w') as f:
+        f.write(content)
 
-        with open(result_file, 'w') as f:
-            f.write(content)
-        update_status(order_id, 'finished')
-    except Exception:
-        update_status(order_id, 'failed')
-        insert_tb(order_id, traceback.format_exc())
+def process_img(order_dir, url):
+    urls = Scraper(url).get_img_urls()
+    os.makedirs(order_dir)
 
-def process_img(order_id, url):
-    try:
-        update_status(order_id, 'processing')
-        order_dir = path.join(files_dir, str(order_id))
-
-        urls = Scraper(url).get_img_urls()
-        os.makedirs(order_dir)
-
-        for url in urls:
-            f_name = path.splitext(url.split('/')[-1])[0] + '.jpg'
-            f_path = path.join(order_dir, f_name)
-            r = requests.get(url, allow_redirects=True)
-            with open(f_path, 'wb') as f:
-                f.write(r.content)
-        update_status(order_id, 'finished')
-    except Exception:
-        update_status(order_id, 'failed')
-        insert_tb(order_id, traceback.format_exc())
+    for url in urls:
+        f_name = path.splitext(url.split('/')[-1])[0] + '.jpg'
+        f_path = path.join(order_dir, f_name)
+        r = requests.get(url, allow_redirects=True)
+        with open(f_path, 'wb') as f:
+            f.write(r.content)
 
 while True:
     order = db.select_row('''SELECT id, data_type, url FROM orders WHERE status = 'waiting' ORDER BY id''')
@@ -69,8 +53,18 @@ while True:
         order_id = order[0]
         data_type = order[1]
         url = order[2]
+
+        update_status(order_id, 'processing')
+        order_dir = path.join(files_dir, str(order_id))
+
         f_name = 'process_{}'.format(data_type)
-        eval(f_name)(order_id, url)
+
+        try:
+            eval(f_name)(order_dir, url)
+            update_status(order_id, 'finished')
+        except Exception:
+            update_status(order_id, 'failed')
+            insert_tb(order_id, traceback.format_exc())
     else:
         sleep(2)
 
