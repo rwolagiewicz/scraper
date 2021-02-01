@@ -14,6 +14,7 @@ Scraper downloading images or text from web pages.
 ### Tests
 
 ```pytest test/test_scraper.py``` 
+
 ```python3 test/run_api_tests.py --url localhost:3021``` 
 
 
