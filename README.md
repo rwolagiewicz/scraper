@@ -19,7 +19,10 @@ Scraper downloading images or text from web pages.
 
 ### comment for FeedbackSemantive:
 The solution has been automated and Docker containered.
+
 Architecture allows to accept large numbers of URLs,
 which maker is processing one by one.
+
 Number of makers might be increased in order to speed up processing.
+
 Api tests could be more detailed.
