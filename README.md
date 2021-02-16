@@ -14,20 +14,23 @@ System supports data collection, eg. for machine learning.
 
 ### Resources
 
-*   POST ```/images``` - order downloading images from web page, providing a url
-*   POST ```/content``` - order donloading text from web page, providing a url
-*   GET  ```/status/{order_id}``` - check order status
+*   POST ```/images```              - order downloading images from web page, providing a url
+*   POST ```/content```             - order donloading text from web page, providing a url
+*   GET  ```/status/{order_id}```   - check order status
 *   GET  ```/download/{order_id}``` - download finished order
 
 ### Example usage
 
 Order downloading:
+
 ```curl -d 'https://flask-restful.readthedocs.io/' -X POST localhost:3021/content```
 
 Check status:
+
 ```curl localhost:3021/status/{order_id}```
 
 Download:
+
 ```curl localhost:3021/status/{order_id}```
 
 ### Tests
