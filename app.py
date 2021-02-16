@@ -57,7 +57,7 @@ class Download(Resource):
         if not path.isdir(order_dir):
             return '', 404
         elif status != 'finished':
-            return make_response('Order not ready!', 204)
+            return make_response('Order not ready!', 202)
 
         file_name = '{}.zip'.format(order_id)
         file_stream = BytesIO()
