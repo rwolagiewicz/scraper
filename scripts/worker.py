@@ -9,7 +9,7 @@ from db import DB
 
 #   Config
 connstr = os.environ.get('CONNSTR', '')
-files_dir = os.environ.get('ORDER_DIR', '/maker/orders/')
+files_dir = os.environ.get('ORDER_DIR', '/worker/orders/')
 
 #   Init DB
 db = DB(connstr)

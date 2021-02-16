@@ -31,18 +31,18 @@ services:
         command: ["waitress-serve", "--port", "3021", "--host", "0.0.0.0", "app:app"]
         ports:
             - "3021:3021"
-    maker:
+    worker:
         depends_on:
             db:
                 condition: service_healthy
         restart: always
         build:
             context: .
-            dockerfile: dockers/maker/Dockerfile
+            dockerfile: dockers/worker/Dockerfile
         volumes:
-            - files:/maker/orders
+            - files:/worker/orders
         environment:
             - CONNSTR=dbname=scraper user=scraper password=scraper_123 host=db
-        command: ["./maker.py"]
+        command: ["./worker.py"]
 volumes:
     files:
