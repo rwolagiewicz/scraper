@@ -15,19 +15,6 @@ files_dir = os.environ.get('ORDER_DIR', '/worker/orders/')
 db = DB(connstr)
 
 
-def update_status(order_id, status):
-    db.do('''
-        UPDATE orders
-        SET    (status, updated_at) = (%(status)s, now())
-        WHERE  id = %(order_id)s
-    ''', {'order_id': order_id, 'status': status, })
-
-def insert_tb(order_id, tb):
-    db.do('''
-        INSERT INTO traceback_log (order_id, tb)
-        VALUES (%(order_id)s, %(tb)s)
-    ''', {'order_id': order_id, 'tb': tb, })
-
 def process_txt(order_dir, url):
     result_file = path.join(order_dir, 'content.txt')
     content = Scraper(url).get_content()
@@ -47,24 +34,27 @@ def process_img(order_dir, url):
         with open(f_path, 'wb') as f:
             f.write(r.content)
 
+process_functions = {
+    'txt': process_txt,
+    'img': process_img
+}
+
 while True:
-    order = db.select_row('''SELECT id, data_type, url FROM orders WHERE status = 'waiting' ORDER BY id''')
+    order = db.get_next_order()
     if order:
         order_id = order[0]
         data_type = order[1]
         url = order[2]
 
-        update_status(order_id, 'processing')
+        db.update_status(order_id, 'processing')
         order_dir = path.join(files_dir, str(order_id))
 
-        f_name = 'process_{}'.format(data_type)
-
         try:
-            eval(f_name)(order_dir, url)
-            update_status(order_id, 'finished')
+            process_functions[data_type](order_dir, url)
+            db.update_status(order_id, 'finished')
         except Exception:
             update_status(order_id, 'failed')
-            insert_tb(order_id, traceback.format_exc())
+            db.insert_tb(order_id, traceback.format_exc())
     else:
         sleep(2)
 

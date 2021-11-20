@@ -19,22 +19,6 @@ System supports data collection, eg. for machine learning.
 *   GET  ```/status/{order_id}```   - check order status
 *   GET  ```/download/{order_id}``` - download finished order
 
-### Example usage
-
-Order downloading:
-
-```curl -d 'https://flask-restful.readthedocs.io/' -X POST localhost:3021/content```
-
-Check status:
-
-```curl localhost:3021/status/{order_id}```
-
-Download:
-
-```curl localhost:3021/status/{order_id}```
-
 ### Tests
 
-```pytest test/test_scraper.py``` 
-
-```python3 test/run_api_tests.py --url localhost:3021``` 
+```pytest tests/``` 

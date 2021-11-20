@@ -5,7 +5,7 @@ from io import BytesIO
 from os import path
 from flask import Flask, request, send_file, make_response
 from flask_restful import Resource, Api
-from db import AppDB
+from db import DB
 
 app = Flask(__name__)
 api = Api(app)
@@ -18,7 +18,7 @@ connstr = os.environ.get('CONNSTR', '')
 orders_dir = os.environ.get('ORDER_DIR', '/app/orders/')
 
 #   Init DB
-db = AppDB(connstr)
+db = DB(connstr)
 
 #   Logging
 import logging
